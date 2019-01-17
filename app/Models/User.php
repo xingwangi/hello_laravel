@@ -10,7 +10,11 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-
+    public function gravatar($size = '100')
+    {
+        $hash = md5(strtolower(trim($this->attributes['email'])));
+        return "http://www.gravatar.com/avatar/$hash?s=$size";
+    }
     protected $table = 'users';
     /**
      * The attributes that are mass assignable.
