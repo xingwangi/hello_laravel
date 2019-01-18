@@ -7,14 +7,17 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    /**
+     * UserController constructor.
+     */
     public function __construct()
     {
         $this->middleware('auth', [
-            'except'=>['show','create','store','index']
+            'except' => ['show', 'create', 'store', 'index']
         ]);
-//        只让未登录用户访问登录页面
+
         $this->middleware('guest', [
-               'only'=>['create']
+            'only' => ['create']
         ]);
     }
 
@@ -53,6 +56,10 @@ class UserController extends Controller
         return redirect()->route('users.show', [$user]);
     }
 
+    /**
+     * 编辑动作
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function edit(User $user)
     {
         $this->authorize('update', $user);
@@ -74,5 +81,13 @@ class UserController extends Controller
         $user->update($data);
         session()->flash('success', '个人资料更新成功');
         return redirect()->route('users.show', $user->id);
+    }
+
+    public function destroy(User $user)
+    {
+        $this->authorize('destroy', $user);
+        $user->delete();
+        session()->flash('success', '成功删除用户');
+        return back();
     }
 }
