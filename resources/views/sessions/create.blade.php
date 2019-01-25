@@ -18,10 +18,10 @@
           </div>
 
           <div class="form-group">
-            <label for="password">密码：</label>
+            <label for="password">密码： (<a style="font-size: 12px" href="{{route('password.request')}}">忘记密码?</a>) :
+            </label>
             <input type="password" name="password" class="form-control" value="admin888">
           </div>
-
           <div class="form-group">
             <div class="form-check">
               <input type="checkbox" class="form-check-input" name="remember" id="exampleCheck1">

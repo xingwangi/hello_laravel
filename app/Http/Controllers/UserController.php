@@ -14,7 +14,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store', 'index','confirmEmail']
+            'except' => ['show', 'create', 'store', 'index', 'confirmEmail']
         ]);
 
         $this->middleware('guest', [
@@ -55,7 +55,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            ]);
+        ]);
 //            \Auth::login($user);
         $this->sendEmailConfirmationTo($user);
         session()->flash('success', ' - 验证邮件已发送到你的注册邮箱上，请注意查收。');
@@ -109,16 +109,18 @@ class UserController extends Controller
         return redirect()->route('users.show', [$user]);
     }
 
+//发送邮件
     protected function sendEmailConfirmationTo($user)
     {
         $view = 'emails.confirm';
         $data = compact('user');
+//        dd($data);
         $from = '2859913655@qq.com';
         $name = 'yunie';
         $to = $user->email;
         $subject = '感谢你注册Weibo 应用!请确认你的邮箱';
 
-        \Mail::send($view,$data, function ($msg) use ($from,$name,$to,$subject) {
+        \Mail::send($view, $data, function ($msg) use ($from, $name, $to, $subject) {
             $msg->from($from, $name)->to($to)->subject($subject);
         });
     }
