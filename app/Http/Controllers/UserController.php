@@ -8,18 +8,23 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     /**
-     * UserController constructor.
+     * UserController c
+     * onstructor.
      */
     public function __construct()
     {
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store', 'index']
+            'except' => ['show', 'create', 'store', 'index','confirmEmail']
         ]);
 
         $this->middleware('guest', [
             'only' => ['create']
         ]);
     }
+
+    /**
+     *
+     */
 
 
     public function index()
@@ -50,10 +55,11 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-        ]);
-        \Auth::login($user);
-        session()->flash('success', ' - 欢迎，您将在这里开启一段新的旅程~');
-        return redirect()->route('users.show', [$user]);
+            ]);
+//            \Auth::login($user);
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success', ' - 验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
     }
 
     /**
@@ -89,5 +95,31 @@ class UserController extends Controller
         $user->delete();
         session()->flash('success', '成功删除用户');
         return back();
+    }
+
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();//取出第一个用户，在查询不到指定用户时将返回一个 404
+        $user->activated = true;//激活状态
+        $user->activation_token = null;//激活令牌设置为空
+        $user->save();
+        \Auth::login($user);
+        session()->flash('success', '恭喜你，激活成功！');
+        return redirect()->route('users.show', [$user]);
+    }
+
+    protected function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = '2859913655@qq.com';
+        $name = 'yunie';
+        $to = $user->email;
+        $subject = '感谢你注册Weibo 应用!请确认你的邮箱';
+
+        \Mail::send($view,$data, function ($msg) use ($from,$name,$to,$subject) {
+            $msg->from($from, $name)->to($to)->subject($subject);
+        });
     }
 }
